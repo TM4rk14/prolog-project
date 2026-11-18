@@ -132,18 +132,10 @@ on_key(Key, PlayerObj, Matrix, CellWidth, CellHeight,Window,EntityList,GateList)
     ;   true
     ).
   %tudasbazis a nyilakra es a WASD-re igy egyszerubb
-key_direction(w, 0, -1).
-key_direction('<W>', 0, -1).
 key_direction('<cursor_up>', 0, -1).
 
-key_direction(s, 0, 1).
-key_direction('<S>', 0, 1).
 key_direction('<cursor_down>', 0, 1).
 
-key_direction(a, -1, 0).
-key_direction('<A>', -1, 0).
 key_direction('<cursor_left>', -1, 0).
 
-key_direction(d, 1, 0).
-key_direction('<D>', 1, 0).
 key_direction('<cursor_right>', 1, 0).
