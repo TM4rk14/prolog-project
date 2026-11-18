@@ -75,7 +75,7 @@ dfs_koordinatakkal([CurrentNodeX,CurrentNodeY], Visited,VisitedOut,Edges,EdgesOu
       %ezzel megyek tovabb az egyik agon
       dfs_koordinatakkal([NextX,NextY],[[NextX,NextY]|Visited],VisitedAcc,[NewEdge|Edges],EdgesAcc,N,M),
 
-      %meghivom ujra hogy megnezzem hogy van e meg at ami utan visszaerek ide a masik agrol
+      %meghivom ujra hogy megnezzem hogy van e meg ag ami utan visszaerek ide a masik agrol
       dfs_koordinatakkal([CurrentNodeX,CurrentNodeY],VisitedAcc,VisitedOut,EdgesAcc,EdgesOut,N,M);
 
       %ha mar nincstobb ag akkor visszaadom a kapott ertekeket az 
@@ -83,8 +83,6 @@ dfs_koordinatakkal([CurrentNodeX,CurrentNodeY], Visited,VisitedOut,Edges,EdgesOu
       VisitedOut=Visited,
       EdgesOut=Edges
   ).
-
-
 
 nextAdjacentNode(CurrentX,CurrentY,NextX,NextY,N,M,MoveList) :-  
     %teszek egy permutationt hogy ne mindig ugyan ugy nezze a szomszedokat nezzel 
@@ -97,38 +95,6 @@ nextAdjacentNode(CurrentX,CurrentY,NextX,NextY,N,M,MoveList) :-
     NextX=<N,
     NextY>=1,
     NextY=<M.
-
-
-%megallasi feltel
-rajz([], _, _, _,N,M,_) :- !.
-%kirajzolom a vonalakat amik az utak a bejarashoz
-rajz([[XP1,YP1]-[XP2,YP2] | Rest], CurrentWindow, CellWidth, CellHeight,N,M,Edges) :- 
-    CX1 is (XP1 - 1) * CellWidth + (CellWidth / 2),
-    CY1 is (YP1 - 1) * CellHeight + (CellHeight / 2),
-    CX2 is (XP2 - 1) * CellWidth + (CellWidth / 2),
-    CY2 is (YP2 - 1) * CellHeight + (CellHeight / 2),
-    X_Left   is (XP1 - 1) * CellWidth,
-    X_Right  is XP1 * CellWidth,
-    Y_Top    is (YP1 - 1) * CellHeight,
-    Y_Bottom is YP1 * CellHeight,
-    %felso vonal
-    %feltetel -> 
-    (YP1=:=1->send(CurrentWindow,display,new(_,line(X_Left,Y_Top,X_Right,Y_Top)));true),
-
-    %bal kulso fal
-    (XP1=:=1->send(CurrentWindow,display,new(_,line(X_Left,Y_Top,X_Left,Y_Bottom)));true),
-
-    %also fal <-> ha racs vagy ha nem lefele mentem 
-    NextYP2 is YP1 + 1,
-    ((YP1=:=M ; \+ atmegy([XP1,YP1],[XP1,NextYP2],Edges))->send(CurrentWindow,display,new(_,line(X_Left,Y_Bottom,X_Right,Y_Bottom)));true),
-
-    %jobb oldali fal <--->
-    NextXP2 is XP1 +1,
-    ((XP1=:=N; \+ atmegy([XP1,YP1],[NextXP2,YP1],Edges))->send(CurrentWindow,display,new(_,line(X_Right,Y_Top,X_Right,Y_Bottom)));true),
-    
-    %send(CurrentWindow, display, new(_, line(CX1, CY1, CX2, CY2))),
-    % send(CurrentWindow,display,new(_,line(CX1,CY1,CX2,CY2))),
-    rajz(Rest, CurrentWindow, CellWidth, CellHeight,N,M,Edges).
 
 
 setStartPosition([X, Y], MatrixIn,MatrixOut) :-
