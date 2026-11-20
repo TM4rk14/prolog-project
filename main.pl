@@ -3,9 +3,8 @@
 :- ensure_loaded(trans).
 :- ensure_loaded(player).
 :- ensure_loaded(kulcsMovement).
-movelist(M) :- 
+movelist(M) :-
   M = [[1,0],[0,1],[-1,0],[0,-1]].
-
 
 onEdge([X,Y], N, M) :-
     X =:= 1;
@@ -14,7 +13,6 @@ onEdge([X,Y], N, M) :-
     Y =:= M.
 
 %Megnezem hogy van e atjaras ket cella kozott a path-ben
-%kell a rajzolashoz
 atmegy(Cell1,Cell2,Edges) :-
     (
       member(Cell1-Cell2,Edges);
@@ -63,7 +61,7 @@ partialBfs([Curr | RestQueue], Visited, Edges, Reachable) :-
 
 
   %itt jon a dfs resze
-dfs_koordinatakkal([CurrentNodeX,CurrentNodeY], Visited,VisitedOut,Edges,EdgesOut,N,M) :- 
+dfs_koordinatakkal([CurrentNodeX,CurrentNodeY], Visited,VisitedOut,Edges,EdgesOut,N,M) :-
   movelist(MoveList),
   (
     %veszem a kovi szomszedott ami megfelelo
@@ -75,18 +73,20 @@ dfs_koordinatakkal([CurrentNodeX,CurrentNodeY], Visited,VisitedOut,Edges,EdgesOu
       %ezzel megyek tovabb az egyik agon
       dfs_koordinatakkal([NextX,NextY],[[NextX,NextY]|Visited],VisitedAcc,[NewEdge|Edges],EdgesAcc,N,M),
 
-      %meghivom ujra hogy megnezzem hogy van e meg ag ami utan visszaerek ide a masik agrol
+      %meghivom ujra hogy megnezzem hogy van e meg at ami utan visszaerek ide a masik agrol
       dfs_koordinatakkal([CurrentNodeX,CurrentNodeY],VisitedAcc,VisitedOut,EdgesAcc,EdgesOut,N,M);
 
-      %ha mar nincstobb ag akkor visszaadom a kapott ertekeket az 
+      %ha mar nincstobb ag akkor visszaadom a kapott ertekeket az
       %output argumentumokba
       VisitedOut=Visited,
       EdgesOut=Edges
   ).
 
-nextAdjacentNode(CurrentX,CurrentY,NextX,NextY,N,M,MoveList) :-  
-    %teszek egy permutationt hogy ne mindig ugyan ugy nezze a szomszedokat nezzel 
-    %randomabb lesz a maze 
+
+
+nextAdjacentNode(CurrentX,CurrentY,NextX,NextY,N,M,MoveList) :-
+    %teszek egy permutationt hogy ne mindig ugyan ugy nezze a szomszedokat nezzel
+    %randomabb lesz a maze
     random_permutation(MoveList,ShuffledMoveList),
     member([NextOffsetX,NextOffsetY],ShuffledMoveList),
     NextX is CurrentX + NextOffsetX,
@@ -95,12 +95,6 @@ nextAdjacentNode(CurrentX,CurrentY,NextX,NextY,N,M,MoveList) :-
     NextX=<N,
     NextY>=1,
     NextY=<M.
-
-
-setStartPosition([X, Y], MatrixIn,MatrixOut) :-
-    MatrixX is 2 * X,
-    MatrixY is 2 * Y,
-    setCell(MatrixX, MatrixY, 5, MatrixIn, MatrixOut).
 
 setEndPosition([X, Y], MatrixIn,MatrixOut) :-
     MatrixX is 2 * X,
@@ -137,13 +131,13 @@ calculateGatePositions(Path,Gate1,Gate2,Gate3,Edges):-
     Gate3 = [X31,Y31]-[X32,Y32];
     Gate3 = [X32,Y32]-[X31,Y31]).
 
-setEdge(BaseMatrix, OutMatrix, GateCode, [X1,Y1]-[X2,Y2]) :- 
+setEdge(BaseMatrix, OutMatrix, GateCode, [X1,Y1]-[X2,Y2]) :-
   RoadX is X1 + X2,
   RoadY is Y1 + Y2,
-  setCell(RoadX, RoadY, GateCode, BaseMatrix, OutMatrix). 
+  setCell(RoadX, RoadY, GateCode, BaseMatrix, OutMatrix).
 
 setGatePositions(BaseMatrix,OutMatrix,Gate1,Gate2,Gate3):-
-    setEdge(BaseMatrix, Matrix2, 3, Gate1), 
+    setEdge(BaseMatrix, Matrix2, 3, Gate1),
     setEdge(Matrix2, Matrix3, 4, Gate2),
     setEdge(Matrix3, OutMatrix, 5, Gate3).
 
@@ -161,14 +155,10 @@ kulcsGeneralas(StartPoint, ZoneEdges, PartialEdges, Kulcs) :-
     random_permutation(Zsakutcak, Shuffled), %megkeverjuk random
     Shuffled = [Kulcs | _]. %az elsot kivesszuk a kulcsnak
 
-setKulcsPositions(BaseMatrix,OutMatrix,X1,Y1,X2,Y2,X3,Y3):-
-    setCell(X1, Y1, 4, BaseMatrix, Matrix2),
-    setCell(X2, Y2, 4, Matrix2, Matrix3),
-    setCell(X3, Y3, 4, Matrix3, OutMatrix).
-
+%ajanlott futtatas: generate(816,816,12,12). ezzel jol neznek ki a sprite-ok
 generate(InputWidth, InputHeight, N, M) :-
     % labirintus generalas
-    dfs_koordinatakkal([1,1], [[1,1]], Visited, [], Edges, N, M),
+    dfs_koordinatakkal([1,1], [[1,1]], _Visited, [], Edges, N, M),
 
     % Kezdo es vegpont szamitas
     bfs([[1,1]], [[1,1]], Edges, [1,1], Start, N, M),
@@ -214,8 +204,8 @@ generate(InputWidth, InputHeight, N, M) :-
     % legeneraljuk a matrixot az elek alapjan
     generateMatrix(N, M, PartialEdges, Matrix1),
     %feljegyezzuk a kapukat
-    setGatePositions(Matrix1,Matrix3,Gate1,Gate2,Gate3), % uj
-    setEndPosition(End,Matrix3,FinalMatrix), % uj
+    setGatePositions(Matrix1,Matrix3,Gate1,Gate2,Gate3),
+    setEndPosition(End,Matrix3,FinalMatrix),
 
 
     % ablak meretezes
@@ -229,37 +219,36 @@ generate(InputWidth, InputHeight, N, M) :-
     % ablak letrehozasa es rajzolas
     new(W, picture('XPCE')),
     send(W, size, size(WinWidth, WinHeight)),
-    %kiveszem a start poziciot amit a bfs-el legeneraltam majd bescalelem hogy jo legyen a matrixon 
+    %kiveszem a start poziciot amit a bfs-el legeneraltam majd bescalelem hogy jo legyen a matrixon
     getPointFromList(Start,StartX,StartY),
     ScaledStartX is StartX*2,
     ScaledStartY is StartY*2,
     draw_row(FinalMatrix, 1, CellWidth, CellHeight, W),
     create_player(W,CellWidth,CellHeight,1,[ScaledStartX,ScaledStartY],PlayerObj),
-  
 
-    %megcsinalom a kulcsokat 
-    create_player(W,CellWidth,CellHeight,6,[X1,Y1],KeyObj1), % 
-    create_player(W,CellWidth,CellHeight,7,[X2,Y2],KeyObj2), % 
-    create_player(W,CellWidth,CellHeight,8,[X3,Y3],KeyObj3), 
-    KeyObjList=[KeyObj1,KeyObj2,KeyObj3], 
+
+    %megcsinalom a kulcsokat
+    create_player(W,CellWidth,CellHeight,6,[X1,Y1],KeyObj1), %
+    create_player(W,CellWidth,CellHeight,7,[X2,Y2],KeyObj2), %
+    create_player(W,CellWidth,CellHeight,8,[X3,Y3],KeyObj3),
+    KeyObjList=[KeyObj1,KeyObj2,KeyObj3],
     EntityList=[PlayerObj|KeyObjList],
 
-    %megcsinalom a kapukat 
+    %megcsinalom a kapukat
     maplist(getGateCoords,[Gate1,Gate2,Gate3],GateList),
     setup_controls(W,FinalMatrix,CellWidth,CellHeight,PlayerObj,EntityList,GateList),
-    
+
     %timer ami idonkent elinditja a kulcsok mozgasat
     new(T, timer(0.4, message(@prolog, moveKeys, prolog(KeyObjList), prolog(FinalMatrix), W, CellWidth, CellHeight, prolog(EntityList), prolog(GateList)))),
-    send(W, attribute, key_timer, T), 
+    send(W, attribute, key_timer, T),
     send(T, start),
     send(W, done_message, and(message(T, stop), message(T, free), message(W, destroy))),
-    
+
     send(W, open),
     send(W?frame, keyboard_focus, W).
-    % ablak megnyitas
 
 getPointFromList([PosX,PosY],PosX,PosY).
 
-getGateCoords([X1,Y1]-[X2,Y2],[RealX,RealY]):- 
+getGateCoords([X1,Y1]-[X2,Y2],[RealX,RealY]):-
     RealX is X1 + X2,
     RealY is Y1 + Y2.
